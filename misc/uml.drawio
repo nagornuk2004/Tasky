@@ -1,0 +1,46 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="DQf_G7lulr3EaNvFyR4E">
+    <mxGraphModel dx="542" dy="381" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="a3Y4Ix0RJj4crLxQfcjv-1" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="Task" vertex="1">
+          <mxGeometry height="120" width="160" x="320" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="a3Y4Ix0RJj4crLxQfcjv-2" parent="a3Y4Ix0RJj4crLxQfcjv-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="&lt;div&gt;+ id: Uuid&lt;/div&gt;+ name: String&lt;div&gt;+ description: String?&lt;br&gt;&lt;div&gt;+ due: Date?&lt;/div&gt;&lt;div&gt;+ priority: Enum&amp;lt;Priority&amp;gt;?&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="94" width="160" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a3Y4Ix0RJj4crLxQfcjv-17" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="Project" vertex="1">
+          <mxGeometry height="161" width="160" x="320" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="a3Y4Ix0RJj4crLxQfcjv-18" parent="a3Y4Ix0RJj4crLxQfcjv-17" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="- tasks: ArrayList&amp;lt;Task&amp;gt;" vertex="1">
+          <mxGeometry height="26" width="160" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a3Y4Ix0RJj4crLxQfcjv-19" parent="a3Y4Ix0RJj4crLxQfcjv-17" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" value="" vertex="1">
+          <mxGeometry height="8" width="160" y="52" as="geometry" />
+        </mxCell>
+        <mxCell id="a3Y4Ix0RJj4crLxQfcjv-20" parent="a3Y4Ix0RJj4crLxQfcjv-17" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="+ findAll(): List&amp;lt;Task&amp;gt;&lt;div&gt;+ findOne(Uuid): Task&lt;/div&gt;&lt;div&gt;+ create(Task): void&lt;/div&gt;&lt;div&gt;+ update(Uuid, Task): Boolean&lt;br&gt;&lt;div&gt;+ delete(Uuid): Boolean&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="101" width="160" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a3Y4Ix0RJj4crLxQfcjv-21" edge="1" parent="1" source="a3Y4Ix0RJj4crLxQfcjv-1" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="a3Y4Ix0RJj4crLxQfcjv-17" value="">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="280" y="570" as="sourcePoint" />
+            <mxPoint x="470" y="500" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a3Y4Ix0RJj4crLxQfcjv-22" parent="1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="AppData" vertex="1">
+          <mxGeometry height="80" width="160" x="320" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="a3Y4Ix0RJj4crLxQfcjv-23" parent="a3Y4Ix0RJj4crLxQfcjv-22" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" value="+ projects: ArrayList&amp;lt;Project&amp;gt;" vertex="1">
+          <mxGeometry height="54" width="160" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="a3Y4Ix0RJj4crLxQfcjv-26" edge="1" parent="1" source="a3Y4Ix0RJj4crLxQfcjv-17" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="a3Y4Ix0RJj4crLxQfcjv-22" value="">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="230" y="250" as="sourcePoint" />
+            <mxPoint x="390" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
