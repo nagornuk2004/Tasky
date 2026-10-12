@@ -5,8 +5,8 @@ import java.util.UUID
 
 data class Task(
     val id: UUID = UUID.randomUUID(),
-    val name: String,
-    val description: String?,
-    val due: LocalDate?,
-    val priority: Priority?
+    var name: String,
+    var description: String?,
+    var due: LocalDate?,
+    var priority: Priority?
 )

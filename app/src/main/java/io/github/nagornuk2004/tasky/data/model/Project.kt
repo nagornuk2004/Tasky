@@ -4,6 +4,6 @@ import java.util.UUID
 
 data class Project(
     val id: UUID = UUID.randomUUID(),
-    val name: String,
+    var name: String,
     val tasks: List<Task> = emptyList(),
 )
