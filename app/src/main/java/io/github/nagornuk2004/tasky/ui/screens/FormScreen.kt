@@ -17,10 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import io.github.nagornuk2004.tasky.R
+import io.github.nagornuk2004.tasky.data.model.Task
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormScreen(navigateToTasks: () -> Unit) {
+fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
+    val nameState = rememberTextFieldState(initialText = "")
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -31,7 +33,10 @@ fun FormScreen(navigateToTasks: () -> Unit) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) { // TODO: Save Task
+                    IconButton(onClick = {
+                        tasksViewModel.createTask(Task(name = nameState.text as String))
+                        navigateToTasks()
+                    }) {
                         Icon(
                             painterResource(R.drawable.ic_save),
                             contentDescription = "Save Item"
@@ -46,8 +51,8 @@ fun FormScreen(navigateToTasks: () -> Unit) {
         ) {
             item {
                 TextField(
+                    state = nameState,
                     modifier = Modifier.padding(10.dp, 10.dp),
-                    state = rememberTextFieldState(initialText = ""),
                     label = { Text("Name") },
                     lineLimits = TextFieldLineLimits.SingleLine
                 )

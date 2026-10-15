@@ -13,7 +13,7 @@ import androidx.compose.ui.res.painterResource
 import io.github.nagornuk2004.tasky.R
 
 @Composable
-fun TasksScreen(navigateToForm: () -> Unit) {
+fun TasksScreen(tasksViewModel: TasksViewModel, navigateToForm: () -> Unit) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(navigateToForm) {
@@ -22,21 +22,11 @@ fun TasksScreen(navigateToForm: () -> Unit) {
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            item {
-                ListItem(
-                    { Text("Wash dishes") }
-                )
-            }
-            item {
-                ListItem(
-                    { Text("Clean room") }
-                )
-            }
-            item {
-                ListItem(
-                    { Text("Complete Mobile App Dev Assignment") }
-                )
-            }
+                items(count = tasksViewModel.tasks.size) { index ->
+                    ListItem(
+                        headlineContent = { Text(tasksViewModel.tasks[index].name) }
+                    )
+                }
         }
     }
 }

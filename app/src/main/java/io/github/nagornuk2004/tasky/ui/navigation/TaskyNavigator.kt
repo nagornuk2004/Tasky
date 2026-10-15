@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.github.nagornuk2004.tasky.ui.screens.FormScreen
 import io.github.nagornuk2004.tasky.ui.screens.TasksScreen
+import io.github.nagornuk2004.tasky.ui.screens.TasksViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -19,7 +20,7 @@ object Tasks
 object Form
 
 @Composable
-fun TaskyNavigator() {
+fun TaskyNavigator(tasksViewModel: TasksViewModel) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -34,7 +35,7 @@ fun TaskyNavigator() {
             )
         }
     ) {
-        composable<Tasks> { TasksScreen() {
+        composable<Tasks> { TasksScreen(tasksViewModel) {
             navController.navigate(Form)
         } }
         composable<Form> (
@@ -50,7 +51,7 @@ fun TaskyNavigator() {
                     towards = AnimatedContentTransitionScope.SlideDirection.Right
                 )
             }
-        ) { FormScreen() {
+        ) { FormScreen(tasksViewModel) {
             navController.popBackStack()
         } }
     }
