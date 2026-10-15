@@ -1,5 +1,7 @@
 package io.github.nagornuk2004.tasky.ui.screens
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -55,13 +57,15 @@ fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
                 actions = {
                     IconButton(onClick = {
                         if (nameState.text.isNotBlank()) {
-                            tasksViewModel.createTask(Task(
-                                name = nameState.text as String,
-                                description = descriptionState.text.toString(),
-                                tag = tagState.text.toString(),
-                                due = dueState.getSelectedDate(),
-                                priority = Priority.fromString(priorityState.text.toString())
-                            ))
+                            tasksViewModel.createTask(
+                                Task(
+                                    name = nameState.text as String,
+                                    description = descriptionState.text.toString(),
+                                    tag = tagState.text.toString(),
+                                    due = dueState.getSelectedDate(),
+                                    priority = Priority.fromString(priorityState.text.toString())
+                                )
+                            )
                             navigateToTasks()
                         }
                     }) {
@@ -82,7 +86,9 @@ fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
             item {
                 TextField(
                     state = nameState,
-                    modifier = Modifier.padding(PAD, PAD),
+                    modifier = Modifier
+                        .padding(PAD, PAD)
+                        .fillMaxWidth(),
                     label = { Text("Name") },
                     lineLimits = TextFieldLineLimits.SingleLine
                 )
@@ -90,48 +96,58 @@ fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
             item {
                 TextField(
                     state = descriptionState,
-                    modifier = Modifier.padding(PAD, PAD),
+                    modifier = Modifier
+                        .padding(PAD, PAD)
+                        .fillMaxWidth(),
                     label = { Text("Description") }
                 )
             }
             item {
-                TextField(
-                    state = tagState,
-                    modifier = Modifier.padding(PAD, PAD),
-                    label = { Text("Tag") },
-                    lineLimits = TextFieldLineLimits.SingleLine
-                )
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        TextField(
+                            state = tagState,
+                            modifier = Modifier.padding(PAD, PAD),
+                            label = { Text("Tag") },
+                            lineLimits = TextFieldLineLimits.SingleLine
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        var expanded by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(
+                            expanded = expanded,
+                            onExpandedChange = { expanded = it }) {
+                            OutlinedTextField(
+                                modifier = Modifier
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                    .padding(PAD, PAD),
+                                readOnly = true,
+                                state = priorityState,
+                                label = { Text("Priority") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }) {
+                                Priority.entries.forEach { entry ->
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            priorityState.setTextAndPlaceCursorAtEnd(entry.label)
+                                            expanded = false
+                                        },
+                                        text = { Text(entry.label) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
             item {
                 DatePicker(
                     state = dueState,
                     modifier = Modifier.padding(PAD, PAD)
                 )
-            }
-            item {
-                var expanded by remember { mutableStateOf(false) }
-                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                            .padding(PAD, PAD),
-                        readOnly = true,
-                        state = priorityState,
-                        label = { Text("Priority") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
-                    )
-                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        Priority.entries.forEach { entry ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    priorityState.setTextAndPlaceCursorAtEnd(entry.label)
-                                    expanded = false
-                                },
-                                text = { Text(entry.label) }
-                            )
-                        }
-                    }
-                }
             }
         }
     }
