@@ -33,6 +33,8 @@ import io.github.nagornuk2004.tasky.R
 import io.github.nagornuk2004.tasky.data.model.Priority
 import io.github.nagornuk2004.tasky.data.model.Task
 
+val PAD = 10.dp
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
@@ -40,7 +42,7 @@ fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
     val descriptionState = rememberTextFieldState("")
     val tagState = rememberTextFieldState("")
     val dueState = rememberDatePickerState()
-    val priorityState = rememberTextFieldState(Priority.MEDIUM.toString())
+    val priorityState = rememberTextFieldState(Priority.MEDIUM.label)
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -53,18 +55,12 @@ fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
                 actions = {
                     IconButton(onClick = {
                         if (nameState.text.isNotBlank()) {
-                            var priority: Priority? = null;
-                            when (priorityState.text) {
-                                "LOW" -> priority = Priority.LOW
-                                "MEDIUM" -> priority = Priority.MEDIUM
-                                "HIGH" -> priority = Priority.HIGH
-                            }
                             tasksViewModel.createTask(Task(
                                 name = nameState.text as String,
                                 description = descriptionState.text.toString(),
                                 tag = tagState.text.toString(),
                                 due = dueState.getSelectedDate(),
-                                priority = priority
+                                priority = Priority.fromString(priorityState.text.toString())
                             ))
                             navigateToTasks()
                         }
@@ -86,7 +82,7 @@ fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
             item {
                 TextField(
                     state = nameState,
-                    modifier = Modifier.padding(10.dp, 10.dp),
+                    modifier = Modifier.padding(PAD, PAD),
                     label = { Text("Name") },
                     lineLimits = TextFieldLineLimits.SingleLine
                 )
@@ -94,14 +90,14 @@ fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
             item {
                 TextField(
                     state = descriptionState,
-                    modifier = Modifier.padding(10.dp, 10.dp),
+                    modifier = Modifier.padding(PAD, PAD),
                     label = { Text("Description") }
                 )
             }
             item {
                 TextField(
                     state = tagState,
-                    modifier = Modifier.padding(10.dp, 10.dp),
+                    modifier = Modifier.padding(PAD, PAD),
                     label = { Text("Tag") },
                     lineLimits = TextFieldLineLimits.SingleLine
                 )
@@ -109,7 +105,7 @@ fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
             item {
                 DatePicker(
                     state = dueState,
-                    modifier = Modifier.padding(10.dp, 10.dp)
+                    modifier = Modifier.padding(PAD, PAD)
                 )
             }
             item {
@@ -118,20 +114,20 @@ fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
                     OutlinedTextField(
                         modifier = Modifier
                             .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                            .padding(10.dp, 10.dp),
+                            .padding(PAD, PAD),
                         readOnly = true,
                         state = priorityState,
                         label = { Text("Priority") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
                     )
                     ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        Priority.entries.forEach { selectionOption ->
+                        Priority.entries.forEach { entry ->
                             DropdownMenuItem(
                                 onClick = {
-                                    priorityState.setTextAndPlaceCursorAtEnd(selectionOption.toString())
+                                    priorityState.setTextAndPlaceCursorAtEnd(entry.label)
                                     expanded = false
                                 },
-                                text = { Text(selectionOption.toString()) }
+                                text = { Text(entry.label) }
                             )
                         }
                     }
