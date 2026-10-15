@@ -3,16 +3,21 @@ package io.github.nagornuk2004.tasky.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import io.github.nagornuk2004.tasky.R
 import io.github.nagornuk2004.tasky.data.model.Task
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @Composable
-fun TaskListItem(task: Task) {
+fun TaskListItem(task: Task, markTaskAsDone: (UUID) -> Unit) {
     ListItem(
         headlineContent = { Text(task.name) },
         overlineContent = { Row(modifier = Modifier.fillMaxWidth()) {
@@ -30,6 +35,11 @@ fun TaskListItem(task: Task) {
             if (task.due != null) Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f)) {
                 Text("Due: " + task.due!!.format(DateTimeFormatter.ofPattern("d MMM")))
             }
-        } }
+        } },
+        trailingContent = {
+            IconButton(onClick = { markTaskAsDone(task.id) }) {
+                Icon(painterResource(R.drawable.ic_check), contentDescription = "Mark task as done")
+            }
+        }
     )
 }
