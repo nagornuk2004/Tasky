@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import io.github.nagornuk2004.tasky.R
+import io.github.nagornuk2004.tasky.ui.components.TaskListItem
 
 @Composable
 fun TasksScreen(tasksViewModel: TasksViewModel, navigateToForm: () -> Unit) {
@@ -23,9 +24,7 @@ fun TasksScreen(tasksViewModel: TasksViewModel, navigateToForm: () -> Unit) {
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
                 items(count = tasksViewModel.tasks.size) { index ->
-                    ListItem(
-                        headlineContent = { Text(tasksViewModel.tasks[index].name) }
-                    )
+                    TaskListItem(tasksViewModel.tasks[index])
                 }
         }
     }
