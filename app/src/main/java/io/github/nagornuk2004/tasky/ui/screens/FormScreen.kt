@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -41,7 +43,8 @@ import io.github.nagornuk2004.tasky.data.model.Priority
 import io.github.nagornuk2004.tasky.data.model.Task
 import java.time.format.DateTimeFormatter
 
-val PAD = 10.dp
+private const val DATE_PATTERN = "d MMM"
+private val PAD = 10.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +56,7 @@ fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTa
     val priorityState = rememberTextFieldState(selectedTask?.priority?.label ?: "Medium")
     val dateFieldState = rememberTextFieldState(
         selectedTask?.due
-            ?.format(DateTimeFormatter.ofPattern("d MMM")) ?: ""
+            ?.format(DateTimeFormatter.ofPattern(DATE_PATTERN)) ?: ""
     )
     var showDatePicker by remember { mutableStateOf(false) }
     if (showDatePicker) {
@@ -62,7 +65,8 @@ fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTa
             confirmButton = {
                 TextButton(onClick = {
                     dateFieldState.setTextAndPlaceCursorAtEnd(
-                        dueState.getSelectedDate()?.format(DateTimeFormatter.ofPattern("d MMM"))
+                        dueState.getSelectedDate()
+                            ?.format(DateTimeFormatter.ofPattern(DATE_PATTERN))
                             ?: ""
                     )
                     showDatePicker = false
@@ -86,27 +90,15 @@ fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTa
                 actions = {
                     IconButton(onClick = {
                         if (nameState.text.isNotBlank()) {
-                            if (selectedTask == null)
-                                tasksViewModel.createTask(
-                                    Task(
-                                        name = nameState.text as String,
-                                        description = descriptionState.text.toString(),
-                                        tag = tagState.text.toString(),
-                                        due = dueState.getSelectedDate(),
-                                        priority = Priority.fromString(priorityState.text.toString())
-                                    )
-                                )
-                            else
-                                tasksViewModel.updateTask(
-                                    Task(
-                                        id = selectedTask.id,
-                                        name = nameState.text as String,
-                                        description = descriptionState.text.toString(),
-                                        tag = tagState.text.toString(),
-                                        due = dueState.getSelectedDate(),
-                                        priority = Priority.fromString(priorityState.text.toString())
-                                    )
-                                )
+                            val task = Task(
+                                name = nameState.text.toString(),
+                                description = descriptionState.text.toString(),
+                                tag = tagState.text.toString(),
+                                due = dueState.getSelectedDate(),
+                                priority = Priority.fromString(priorityState.text.toString())
+                            )
+                            if (selectedTask == null) tasksViewModel.createTask(task)
+                            else tasksViewModel.updateTask(task.copy(id = selectedTask.id))
                             navigateToTasks()
                         }
                     }) {
@@ -119,92 +111,87 @@ fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTa
             )
         },
     ) { innerPadding ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
         ) {
-            item {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        TextField(
-                            state = nameState,
-                            modifier = Modifier
-                                .padding(PAD, PAD)
-                                .fillMaxWidth(),
-                            label = { Text("Name") },
-                            lineLimits = TextFieldLineLimits.SingleLine
-                        )
-                    }
-                    Column(modifier = Modifier.weight(1f)) {
-                        TextField(
-                            state = tagState,
-                            modifier = Modifier.padding(PAD, PAD),
-                            label = { Text("Tag") },
-                            lineLimits = TextFieldLineLimits.SingleLine
-                        )
-                    }
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.weight(1f)) {
+                    TextField(
+                        state = nameState,
+                        modifier = Modifier
+                            .padding(PAD, PAD)
+                            .fillMaxWidth(),
+                        label = { Text("Name") },
+                        lineLimits = TextFieldLineLimits.SingleLine
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    TextField(
+                        state = tagState,
+                        modifier = Modifier.padding(PAD, PAD),
+                        label = { Text("Tag") },
+                        lineLimits = TextFieldLineLimits.SingleLine
+                    )
                 }
             }
-            item {
-                TextField(
-                    state = descriptionState,
-                    modifier = Modifier
-                        .padding(PAD, PAD)
-                        .fillMaxWidth(),
-                    label = { Text("Description") }
-                )
-            }
-            item {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        var expanded by remember { mutableStateOf(false) }
-                        ExposedDropdownMenuBox(
+            TextField(
+                state = descriptionState,
+                modifier = Modifier
+                    .padding(PAD, PAD)
+                    .fillMaxWidth(),
+                label = { Text("Description") }
+            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.weight(1f)) {
+                    var expanded by remember { mutableStateOf(false) }
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it }) {
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                .padding(PAD, PAD),
+                            readOnly = true,
+                            state = priorityState,
+                            label = { Text("Priority") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+                        )
+                        ExposedDropdownMenu(
                             expanded = expanded,
-                            onExpandedChange = { expanded = it }) {
-                            OutlinedTextField(
-                                modifier = Modifier
-                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                                    .padding(PAD, PAD),
-                                readOnly = true,
-                                state = priorityState,
-                                label = { Text("Priority") },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
-                            )
-                            ExposedDropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }) {
-                                Priority.entries.forEach { entry ->
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            priorityState.setTextAndPlaceCursorAtEnd(entry.label)
-                                            expanded = false
-                                        },
-                                        text = { Text(entry.label) }
-                                    )
-                                }
+                            onDismissRequest = { expanded = false }) {
+                            Priority.entries.forEach { entry ->
+                                DropdownMenuItem(
+                                    onClick = {
+                                        priorityState.setTextAndPlaceCursorAtEnd(entry.label)
+                                        expanded = false
+                                    },
+                                    text = { Text(entry.label) }
+                                )
                             }
                         }
                     }
-                    Column(modifier = Modifier.weight(1f)) {
-                        Box {
-                            OutlinedTextField(
-                                state = dateFieldState,
-                                readOnly = true,
-                                enabled = true,
-                                label = { Text("Due Date") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(PAD)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .matchParentSize()
-                                    .padding(top = PAD)
-                                    .padding(PAD)
-                                    .clickable { showDatePicker = true }
-                            )
-                        }
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Box {
+                        OutlinedTextField(
+                            state = dateFieldState,
+                            readOnly = true,
+                            enabled = true,
+                            label = { Text("Due Date") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(PAD)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .padding(top = PAD)
+                                .padding(PAD)
+                                .clickable { showDatePicker = true }
+                        )
                     }
                 }
             }

@@ -21,27 +21,31 @@ import java.util.UUID
 fun TaskListItem(task: Task, markTaskAsDone: (UUID) -> Unit, modifyTask: (Task) -> Unit) {
     ListItem(
         headlineContent = { Text(task.name) },
-        overlineContent = { Row(modifier = Modifier.fillMaxWidth()) {
-            Column(horizontalAlignment = Alignment.Start, modifier = Modifier.weight(1f)) {
-                Text(task.tag.orEmpty())
-            }
-            if (task.priority != null) Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f)) {
-                Text(task.priority.toString())
-            }
-        } },
-        supportingContent = { Row(modifier = Modifier.fillMaxWidth()) {
-            Column(horizontalAlignment = Alignment.Start, modifier = Modifier.weight(1f)) {
-                Text(task.description.orEmpty())
-            }
-            if (task.due != null) Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f)) {
-                Text("Due: " + task.due!!.format(DateTimeFormatter.ofPattern("d MMM")))
-            }
-        } },
+        overlineContent = {
+            SpacedRow(task.tag, task.priority.toString())
+        },
+        supportingContent = {
+            SpacedRow(
+                task.description,
+                task.due?.let { "Due: ${it.format(DateTimeFormatter.ofPattern("d MMM"))}" })
+        },
         trailingContent = {
             IconButton(onClick = { markTaskAsDone(task.id) }) {
                 Icon(painterResource(R.drawable.ic_check), contentDescription = "Mark task as done")
             }
         },
-        modifier = Modifier.clickable( onClick = { modifyTask(task) })
+        modifier = Modifier.clickable { modifyTask(task) }
     )
+}
+
+@Composable
+private fun SpacedRow(start: String, end: String?) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.weight(1f)) {
+            Text(start)
+        }
+        Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f)) {
+            Text(end ?: "")
+        }
+    }
 }

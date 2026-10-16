@@ -5,6 +5,10 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,7 +27,7 @@ object Form
 @Composable
 fun TaskyNavigator(tasksViewModel: TasksViewModel) {
     val navController = rememberNavController()
-    var selectedTask: Task? = null;
+    var selectedTask by remember { mutableStateOf<Task?>(null) }
     NavHost(
         navController = navController,
         startDestination = Tasks,
@@ -58,6 +62,7 @@ fun TaskyNavigator(tasksViewModel: TasksViewModel) {
             }
         ) {
             FormScreen(tasksViewModel, selectedTask) {
+                selectedTask = null
                 navController.popBackStack()
             }
         }

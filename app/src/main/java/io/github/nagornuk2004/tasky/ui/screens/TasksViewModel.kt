@@ -16,9 +16,7 @@ class TasksViewModel : ViewModel() {
     }
 
     fun deleteTask(uuid: UUID) {
-        tasks = tasks.filter {
-            it.id != uuid
-        }
+        tasks = tasks.filter { it.id != uuid }
     }
 
     fun updateTask(task: Task) {

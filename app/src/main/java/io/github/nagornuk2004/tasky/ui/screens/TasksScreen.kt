@@ -40,7 +40,7 @@ fun TasksScreen(tasksViewModel: TasksViewModel, navigateToForm: (Task?) -> Unit)
     ) { innerPadding ->
         val filteredTasks = tasksViewModel.tasks.filter {
             it.name.contains(searchFieldState.text, ignoreCase = true) ||
-                    it.description!!.contains(searchFieldState.text, ignoreCase = true)
+                    it.description.contains(searchFieldState.text, ignoreCase = true)
         }
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
             items(count = filteredTasks.size) {

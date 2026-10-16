@@ -6,8 +6,8 @@ import java.util.UUID
 data class Task(
     val id: UUID = UUID.randomUUID(),
     var name: String,
-    var description: String? = null,
+    var description: String = "",
     var due: LocalDate? = null,
     var priority: Priority? = null,
-    var tag: String? = null
+    var tag: String = ""
 )
