@@ -1,15 +1,19 @@
 package io.github.nagornuk2004.tasky.ui.screens
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -20,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.getSelectedDate
 import androidx.compose.material3.rememberDatePickerState
@@ -34,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import io.github.nagornuk2004.tasky.R
 import io.github.nagornuk2004.tasky.data.model.Priority
 import io.github.nagornuk2004.tasky.data.model.Task
+import java.time.format.DateTimeFormatter
 
 val PAD = 10.dp
 
@@ -45,6 +51,26 @@ fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTa
     val tagState = rememberTextFieldState(selectedTask?.tag.orEmpty())
     val dueState = rememberDatePickerState(selectedTask?.due)
     val priorityState = rememberTextFieldState(selectedTask?.priority?.label ?: "Medium")
+    val dateFieldState = rememberTextFieldState(selectedTask?.due
+        ?.format(DateTimeFormatter.ofPattern("d MMM")) ?: "")
+    var showDatePicker by remember { mutableStateOf(false) }
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    dateFieldState.setTextAndPlaceCursorAtEnd(
+                        dueState.getSelectedDate()?.format(DateTimeFormatter.ofPattern("d MMM")) ?: ""
+                    )
+                    showDatePicker = false
+                }) {
+                    Text("Confirm")
+                }
+            }
+        ) {
+            DatePicker(state = dueState)
+        }
+    }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -96,14 +122,26 @@ fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTa
                 .fillMaxWidth(),
         ) {
             item {
-                TextField(
-                    state = nameState,
-                    modifier = Modifier
-                        .padding(PAD, PAD)
-                        .fillMaxWidth(),
-                    label = { Text("Name") },
-                    lineLimits = TextFieldLineLimits.SingleLine
-                )
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        TextField(
+                            state = nameState,
+                            modifier = Modifier
+                                .padding(PAD, PAD)
+                                .fillMaxWidth(),
+                            label = { Text("Name") },
+                            lineLimits = TextFieldLineLimits.SingleLine
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        TextField(
+                            state = tagState,
+                            modifier = Modifier.padding(PAD, PAD),
+                            label = { Text("Tag") },
+                            lineLimits = TextFieldLineLimits.SingleLine
+                        )
+                    }
+                }
             }
             item {
                 TextField(
@@ -116,14 +154,6 @@ fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTa
             }
             item {
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        TextField(
-                            state = tagState,
-                            modifier = Modifier.padding(PAD, PAD),
-                            label = { Text("Tag") },
-                            lineLimits = TextFieldLineLimits.SingleLine
-                        )
-                    }
                     Column(modifier = Modifier.weight(1f)) {
                         var expanded by remember { mutableStateOf(false) }
                         ExposedDropdownMenuBox(
@@ -153,13 +183,25 @@ fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTa
                             }
                         }
                     }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Box {
+                            OutlinedTextField(
+                                state = dateFieldState,
+                                readOnly = true,
+                                enabled = true,
+                                label = { Text("Due Date") },
+                                modifier = Modifier.fillMaxWidth().padding(PAD)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .padding(top = PAD)
+                                    .padding(PAD)
+                                    .clickable { showDatePicker = true }
+                            )
+                        }
+                    }
                 }
-            }
-            item {
-                DatePicker(
-                    state = dueState,
-                    modifier = Modifier.padding(PAD, PAD)
-                )
             }
         }
     }
