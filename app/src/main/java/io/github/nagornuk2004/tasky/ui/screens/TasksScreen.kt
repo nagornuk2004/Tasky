@@ -1,7 +1,11 @@
 package io.github.nagornuk2004.tasky.ui.screens
 
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,12 +18,18 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import io.github.nagornuk2004.tasky.R
+import io.github.nagornuk2004.tasky.data.model.Due
+import io.github.nagornuk2004.tasky.data.model.Priority
 import io.github.nagornuk2004.tasky.data.model.Task
+import io.github.nagornuk2004.tasky.ui.components.FilterOption
 import io.github.nagornuk2004.tasky.ui.components.TaskListItem
 import kotlinx.coroutines.launch
 
@@ -29,19 +39,37 @@ fun TasksScreen(tasksViewModel: TasksViewModel, navigateToForm: (Task?) -> Unit)
     val searchFieldState = rememberTextFieldState("")
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var priorityFilter by remember { mutableStateOf<String?>(null) }
+    var dueFilter by remember { mutableStateOf<String?>(null) }
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    TextField(
-                        state = searchFieldState,
-                        label = { Text("Search") }
+            Column {
+                CenterAlignedTopAppBar(
+                    title = {
+                        TextField(
+                            state = searchFieldState,
+                            label = { Text("Search") }
+                        )
+                    }
+                )
+                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                    FilterOption(
+                        "Priority",
+                        Priority.entries.map { it.label },
+                        priorityFilter,
+                        onSelected = { priorityFilter = it }
+                    )
+                    FilterOption(
+                        "Due",
+                        Due.entries.map { it.label },
+                        dueFilter,
+                        onSelected = { dueFilter = it }
                     )
                 }
-            )
+            }
         },
         floatingActionButton = {
             FloatingActionButton({ navigateToForm(null) }) {
@@ -49,33 +77,44 @@ fun TasksScreen(tasksViewModel: TasksViewModel, navigateToForm: (Task?) -> Unit)
             }
         }
     ) { innerPadding ->
-        val filteredTasks = tasksViewModel.tasks.filter {
+        val searchedTasks = tasksViewModel.tasks.filter {
             it.name.contains(searchFieldState.text, ignoreCase = true) ||
                     it.description.contains(searchFieldState.text, ignoreCase = true)
+        }
+        val filteredTasks = searchedTasks.filter {
+            (priorityFilter == null || it.priority?.label == priorityFilter) &&
+                    (dueFilter == null || it.due?.atStartOfDay() == Due.getTime(
+                        Due.fromString(
+                            dueFilter!!
+                        )
+                    ))
         }
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
             items(count = filteredTasks.size) {
                 val task = filteredTasks[it]
                 TaskListItem(
                     task = task,
-                    markTaskAsDone = { tasksViewModel.deleteTask(task.id, {
-                        scope.launch {
-                            snackbarHostState.currentSnackbarData?.dismiss()
-                            val result = snackbarHostState
-                                .showSnackbar(
-                                    message = "Task marked as completed.",
-                                    actionLabel = "Undo",
-                                )
-                            when (result) {
-                                SnackbarResult.ActionPerformed -> {
-                                    tasksViewModel.restoreDeletedTask()
-                                }
-                                SnackbarResult.Dismissed -> {
+                    markTaskAsDone = {
+                        tasksViewModel.deleteTask(task.id, {
+                            scope.launch {
+                                snackbarHostState.currentSnackbarData?.dismiss()
+                                val result = snackbarHostState
+                                    .showSnackbar(
+                                        message = "Task marked as completed.",
+                                        actionLabel = "Undo",
+                                    )
+                                when (result) {
+                                    SnackbarResult.ActionPerformed -> {
+                                        tasksViewModel.restoreDeletedTask()
+                                    }
 
+                                    SnackbarResult.Dismissed -> {
+
+                                    }
                                 }
                             }
-                        }
-                    }) },
+                        })
+                    },
                     modifyTask = { navigateToForm(task) }
                 )
             }
