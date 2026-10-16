@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.github.nagornuk2004.tasky.data.model.Task
 import io.github.nagornuk2004.tasky.ui.screens.FormScreen
 import io.github.nagornuk2004.tasky.ui.screens.TasksScreen
 import io.github.nagornuk2004.tasky.ui.screens.TasksViewModel
@@ -22,6 +23,7 @@ object Form
 @Composable
 fun TaskyNavigator(tasksViewModel: TasksViewModel) {
     val navController = rememberNavController()
+    var selectedTask: Task? = null;
     NavHost(
         navController = navController,
         startDestination = Tasks,
@@ -36,6 +38,7 @@ fun TaskyNavigator(tasksViewModel: TasksViewModel) {
         }
     ) {
         composable<Tasks> { TasksScreen(tasksViewModel) {
+            selectedTask = it
             navController.navigate(Form)
         } }
         composable<Form> (
@@ -51,7 +54,7 @@ fun TaskyNavigator(tasksViewModel: TasksViewModel) {
                     towards = AnimatedContentTransitionScope.SlideDirection.Right
                 )
             }
-        ) { FormScreen(tasksViewModel) {
+        ) { FormScreen(tasksViewModel, selectedTask) {
             navController.popBackStack()
         } }
     }

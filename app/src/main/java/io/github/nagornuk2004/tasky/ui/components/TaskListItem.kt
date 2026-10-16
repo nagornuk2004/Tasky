@@ -1,5 +1,6 @@
 package io.github.nagornuk2004.tasky.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +18,7 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @Composable
-fun TaskListItem(task: Task, markTaskAsDone: (UUID) -> Unit) {
+fun TaskListItem(task: Task, markTaskAsDone: (UUID) -> Unit, modifyTask: (Task) -> Unit) {
     ListItem(
         headlineContent = { Text(task.name) },
         overlineContent = { Row(modifier = Modifier.fillMaxWidth()) {
@@ -40,6 +41,7 @@ fun TaskListItem(task: Task, markTaskAsDone: (UUID) -> Unit) {
             IconButton(onClick = { markTaskAsDone(task.id) }) {
                 Icon(painterResource(R.drawable.ic_check), contentDescription = "Mark task as done")
             }
-        }
+        },
+        modifier = Modifier.clickable( onClick = { modifyTask(task) })
     )
 }
