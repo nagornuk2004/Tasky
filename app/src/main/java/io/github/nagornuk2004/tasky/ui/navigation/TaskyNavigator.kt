@@ -37,11 +37,13 @@ fun TaskyNavigator(tasksViewModel: TasksViewModel) {
             )
         }
     ) {
-        composable<Tasks> { TasksScreen(tasksViewModel) {
-            selectedTask = it
-            navController.navigate(Form)
-        } }
-        composable<Form> (
+        composable<Tasks> {
+            TasksScreen(tasksViewModel) {
+                selectedTask = it
+                navController.navigate(Form)
+            }
+        }
+        composable<Form>(
             enterTransition = {
                 slideIntoContainer(
                     animationSpec = tween(300),
@@ -54,8 +56,10 @@ fun TaskyNavigator(tasksViewModel: TasksViewModel) {
                     towards = AnimatedContentTransitionScope.SlideDirection.Right
                 )
             }
-        ) { FormScreen(tasksViewModel, selectedTask) {
-            navController.popBackStack()
-        } }
+        ) {
+            FormScreen(tasksViewModel, selectedTask) {
+                navController.popBackStack()
+            }
+        }
     }
 }

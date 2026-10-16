@@ -51,8 +51,10 @@ fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTa
     val tagState = rememberTextFieldState(selectedTask?.tag.orEmpty())
     val dueState = rememberDatePickerState(selectedTask?.due)
     val priorityState = rememberTextFieldState(selectedTask?.priority?.label ?: "Medium")
-    val dateFieldState = rememberTextFieldState(selectedTask?.due
-        ?.format(DateTimeFormatter.ofPattern("d MMM")) ?: "")
+    val dateFieldState = rememberTextFieldState(
+        selectedTask?.due
+            ?.format(DateTimeFormatter.ofPattern("d MMM")) ?: ""
+    )
     var showDatePicker by remember { mutableStateOf(false) }
     if (showDatePicker) {
         DatePickerDialog(
@@ -60,7 +62,8 @@ fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTa
             confirmButton = {
                 TextButton(onClick = {
                     dateFieldState.setTextAndPlaceCursorAtEnd(
-                        dueState.getSelectedDate()?.format(DateTimeFormatter.ofPattern("d MMM")) ?: ""
+                        dueState.getSelectedDate()?.format(DateTimeFormatter.ofPattern("d MMM"))
+                            ?: ""
                     )
                     showDatePicker = false
                 }) {
@@ -190,7 +193,9 @@ fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTa
                                 readOnly = true,
                                 enabled = true,
                                 label = { Text("Due Date") },
-                                modifier = Modifier.fillMaxWidth().padding(PAD)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(PAD)
                             )
                             Box(
                                 modifier = Modifier
