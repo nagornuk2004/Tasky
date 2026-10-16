@@ -20,4 +20,8 @@ class TasksViewModel : ViewModel() {
             it.id != uuid
         }
     }
+
+    fun updateTask(task: Task) {
+        tasks = tasks.map { if(it.id == task.id) task else it }
+    }
 }

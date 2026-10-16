@@ -9,22 +9,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import io.github.nagornuk2004.tasky.R
+import io.github.nagornuk2004.tasky.data.model.Task
 import io.github.nagornuk2004.tasky.ui.components.TaskListItem
 
 @Composable
-fun TasksScreen(tasksViewModel: TasksViewModel, navigateToForm: () -> Unit) {
+fun TasksScreen(tasksViewModel: TasksViewModel, navigateToForm: (Task?) -> Unit) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(navigateToForm) {
+            FloatingActionButton({ navigateToForm(null) }) {
                 Icon(painterResource(R.drawable.ic_create_item), "Create Task")
             }
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(count = tasksViewModel.tasks.size) { index ->
+            items(count = tasksViewModel.tasks.size) {
+                val task = tasksViewModel.tasks[it]
                 TaskListItem(
-                    tasksViewModel.tasks[index]
-                ) { tasksViewModel.deleteTask(tasksViewModel.tasks[index].id) }
+                    task = task,
+                    markTaskAsDone = { tasksViewModel.deleteTask(task.id) },
+                    modifyTask = { navigateToForm(task) }
+                )
             }
         }
     }

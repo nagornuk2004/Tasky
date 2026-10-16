@@ -39,12 +39,12 @@ val PAD = 10.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
-    val nameState = rememberTextFieldState("")
-    val descriptionState = rememberTextFieldState("")
-    val tagState = rememberTextFieldState("")
-    val dueState = rememberDatePickerState()
-    val priorityState = rememberTextFieldState(Priority.MEDIUM.label)
+fun FormScreen(tasksViewModel: TasksViewModel, selectedTask: Task?, navigateToTasks: () -> Unit) {
+    val nameState = rememberTextFieldState(selectedTask?.name.orEmpty())
+    val descriptionState = rememberTextFieldState(selectedTask?.description.orEmpty())
+    val tagState = rememberTextFieldState(selectedTask?.tag.orEmpty())
+    val dueState = rememberDatePickerState(selectedTask?.due)
+    val priorityState = rememberTextFieldState(selectedTask?.priority?.label ?: "Medium")
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -57,15 +57,27 @@ fun FormScreen(tasksViewModel: TasksViewModel, navigateToTasks: () -> Unit) {
                 actions = {
                     IconButton(onClick = {
                         if (nameState.text.isNotBlank()) {
-                            tasksViewModel.createTask(
-                                Task(
-                                    name = nameState.text as String,
-                                    description = descriptionState.text.toString(),
-                                    tag = tagState.text.toString(),
-                                    due = dueState.getSelectedDate(),
-                                    priority = Priority.fromString(priorityState.text.toString())
+                            if (selectedTask == null)
+                                tasksViewModel.createTask(
+                                    Task(
+                                        name = nameState.text as String,
+                                        description = descriptionState.text.toString(),
+                                        tag = tagState.text.toString(),
+                                        due = dueState.getSelectedDate(),
+                                        priority = Priority.fromString(priorityState.text.toString())
+                                    )
                                 )
-                            )
+                            else
+                                tasksViewModel.updateTask(
+                                    Task(
+                                        id = selectedTask.id,
+                                        name = nameState.text as String,
+                                        description = descriptionState.text.toString(),
+                                        tag = tagState.text.toString(),
+                                        due = dueState.getSelectedDate(),
+                                        priority = Priority.fromString(priorityState.text.toString())
+                                    )
+                                )
                             navigateToTasks()
                         }
                     }) {
