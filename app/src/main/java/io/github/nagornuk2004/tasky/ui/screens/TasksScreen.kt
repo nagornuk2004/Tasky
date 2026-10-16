@@ -8,20 +8,31 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import io.github.nagornuk2004.tasky.R
 import io.github.nagornuk2004.tasky.data.model.Task
 import io.github.nagornuk2004.tasky.ui.components.TaskListItem
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TasksScreen(tasksViewModel: TasksViewModel, navigateToForm: (Task?) -> Unit) {
     val searchFieldState = rememberTextFieldState("")
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -47,7 +58,24 @@ fun TasksScreen(tasksViewModel: TasksViewModel, navigateToForm: (Task?) -> Unit)
                 val task = filteredTasks[it]
                 TaskListItem(
                     task = task,
-                    markTaskAsDone = { tasksViewModel.deleteTask(task.id) },
+                    markTaskAsDone = { tasksViewModel.deleteTask(task.id, {
+                        scope.launch {
+                            snackbarHostState.currentSnackbarData?.dismiss()
+                            val result = snackbarHostState
+                                .showSnackbar(
+                                    message = "Task marked as completed.",
+                                    actionLabel = "Undo",
+                                )
+                            when (result) {
+                                SnackbarResult.ActionPerformed -> {
+                                    tasksViewModel.restoreDeletedTask()
+                                }
+                                SnackbarResult.Dismissed -> {
+
+                                }
+                            }
+                        }
+                    }) },
                     modifyTask = { navigateToForm(task) }
                 )
             }

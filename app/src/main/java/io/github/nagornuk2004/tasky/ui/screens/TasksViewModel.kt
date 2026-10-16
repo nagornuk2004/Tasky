@@ -11,12 +11,28 @@ class TasksViewModel : ViewModel() {
     var tasks by mutableStateOf(emptyList<Task>())
         private set
 
+    var deletedTask: Pair<Task, Int>? = null
+
     fun createTask(task: Task) {
         tasks = tasks + task
     }
 
-    fun deleteTask(uuid: UUID) {
-        tasks = tasks.filter { it.id != uuid }
+    fun deleteTask(uuid: UUID, showSnackbar: () -> Unit) {
+        tasks = tasks.filter {
+            if (it.id != uuid) true
+            else {
+                deletedTask = Pair(it, tasks.indexOf(it))
+                false
+            }
+        }
+        showSnackbar()
+    }
+
+    fun restoreDeletedTask() {
+        val (task, index) = deletedTask!!
+        tasks = tasks.toMutableList().apply {
+            add(index, task)
+        }
     }
 
     fun updateTask(task: Task) {
